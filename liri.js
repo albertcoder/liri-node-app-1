@@ -6,16 +6,48 @@ var fs = require("fs");
 var args = process.argv.slice(2);
 var command = args[0];
 var userInput = args.slice(1).join(" ");
-console.log("userInput is: " + userInput);
 
 if (command === "my-tweets") {
-
-	// show the last 20 tweets and when they were created in bash window
-
+	tweetTweet();
 } else if (command === "spotify-this-song") {
-	
-		// if userInput === null/undefined then it defaults to something else.
+	spotifyThis();
+} else if (command === "movie-this") {
+	movieThis();
+} else if (command === "do-what-it-says") {
+	fs.readFile("random.txt", "utf8", function(error, data) {
+		if (error) {
+			return console.log(error);
+		} else {
+			var dataArr = data.split(",");
+			userInput = dataArr[1];
 
+			if (dataArr[0] === "my-tweets") {
+				tweetTweet();
+			} else if (dataArr[0] === "spotify-this-song") {
+				spotifyThis();
+			} else {
+				movieThis();
+			}
+		}
+	});
+}
+
+function tweetTweet() {
+	var client = new twitter(keys.twitterKeys);
+	client.get("statuses/user_timeline", "molva_roham", function(err, tweet, response) {
+		if (err) {
+			return console.log(err);
+		} else {
+			for (var i = 0; i < tweet.length; i++) {
+				console.log(tweet[i].created_at);
+				console.log(tweet[i].text);
+			}
+		}
+	})
+}
+
+function spotifyThis() {
+	var isInputNull = userInput === "" ? userInput = "CSS Suxxx" : userInput = userInput;
 	var spotify = new spotifyReq(keys.spotifyKeys);
 
 	spotify.search({
@@ -24,27 +56,33 @@ if (command === "my-tweets") {
 		limit: 1
 	}, function(err, data) {
 		if (err) {
-			console.log(err);
+			return console.log(err);
 		} else {
-			// console.log(data);
 			console.log("Artist: " + data.tracks.items[0].album.artists[0].name); // artist's name
 			console.log("Song name: " + data.tracks.items[0].name) // song name
 			console.log("External url: " + data.tracks.items[0].album.external_urls.spotify) // external link
 			console.log("Album: " + data.tracks.items[0].album.name) // album name
 		}
 	})
+}
 
-} else if (command === "movie-this") {
+function movieThis() {
+	var isInputNull = userInput === "" ? userInput = "Spaceballs" : userInput = userInput;
+	var queryUrl = "http://www.omdbapi.com/?apikey=40e9cece&t=" + userInput
 
-	// userInput === movie name; show title, year, IMDB rating, Rotten Tomatoes Rating, Country, lang, plot, actors
-	// if userInput === null/undefined then it defaults to something else
-
-} else if (commadn === "do-what-it-says") {
-	fs.readFile("random.txt", "utf8", function(error, data) {
-		if (error) {
-			return console.log(error);
+	request(queryUrl, function(err, response, body) {
+		if (err) {
+			return console.log(err);
 		} else {
-			console.log(data);
+			var rottenExists = JSON.parse(body).Ratings[1] === undefined ? rottenExists = "N/A" : rottenExists = JSON.parse(body).Ratings[1].Value;
+			console.log("Title: " + JSON.parse(body).Title);
+			console.log("Year: " + JSON.parse(body).Year);
+			console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+			console.log("Rotten Tomatoes Rating: " + rottenExists);
+			console.log("Country: " + JSON.parse(body).Country);
+			console.log("Language: " + JSON.parse(body).Language);
+			console.log("Plot: " + JSON.parse(body).Plot);
+			console.log("Actors: " + JSON.parse(body).Actors);	
 		}
-	});
+	})
 }
