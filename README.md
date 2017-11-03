@@ -13,4 +13,4 @@ Liri is a command line node application that takes in four commands:
   * Javascript
   * Request (NPM Package)
   * Node-Spotify-API (NPM Package)
-  * Spotify (NPM Package)
+  * Twitter (NPM Package)
